@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>柳青画庄 v2.1 · 套版印画</title>
+<style>
+  /* 内嵌思源宋体子集（fonts/ 目录，缺失时自动回退系统宋体） */
+  @font-face{font-family:"Serif SC Sub";src:url("fonts/serif-600.woff2") format("woff2");font-weight:600;font-display:swap}
+  @font-face{font-family:"Serif SC Sub";src:url("fonts/serif-900.woff2") format("woff2");font-weight:900;font-display:swap}
+
+  :root{
+    --ink:#26221c; --paper:#f6eed9; --paper2:#efe5cd; --red:#a83226; --red-deep:#8c2a1f;
+    --indigo:#24425c; --gold:#d9a441; --faint:#6f6247; --line:#c9b78f;
+    --sh:2.5px 2.5px 0 rgba(36,66,92,.85);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;background:radial-gradient(1100px 760px at 68% 18%,#26221c,#151310 70%);display:flex;align-items:center;justify-content:center;gap:56px;min-height:100vh;padding:24px}
+  .serif{font-family:"Serif SC Sub","STZhongsong","STSong","SimSun",serif}
+  .kai{font-family:"KaiTi","STKaiti","Serif SC Sub",serif}
+
+  .pitch{max-width:270px;color:#d9cfbc}
+  .pitch .tag{display:inline-block;font-size:11px;letter-spacing:4px;border:1px solid #6b5f4c;color:#c9b98f;padding:4px 10px;margin-bottom:18px}
+  .pitch h1{font-size:28px;line-height:1.4;color:#f2e8d5;margin-bottom:14px}
+  .pitch h1 em{font-style:normal;color:#e0a24b}
+  .pitch p{font-size:12.5px;line-height:1.9;color:#a99e8a;margin-bottom:18px}
+  .pitch ul{list-style:none;font-size:12.5px;line-height:1.7;color:#cfc4ad}
+  .pitch ul li{margin-bottom:11px;padding-left:20px;position:relative}
+  .pitch ul li b{color:#f2e8d5;display:block;font-size:13.5px;margin-bottom:2px}
+  .pitch ul li::before{content:"";position:absolute;left:0;top:5px;width:11px;height:11px;background:var(--red);box-shadow:2px 2px 0 rgba(36,66,92,.8)}
+  .pitch .foot{font-size:11px;color:#6f6552;margin-top:20px;border-top:1px dashed #4a4234;padding-top:14px;line-height:1.8}
+  @media (max-width:1100px){.pitch{display:none}}
+
+  .phone{width:394px;height:846px;background:#141416;border-radius:56px;padding:9px;position:relative;box-shadow:0 30px 80px rgba(0,0,0,.6),inset 0 0 0 2px #3a3a3e}
+  .screen{width:100%;height:100%;border-radius:48px;overflow:hidden;overflow:clip;position:relative;background:var(--paper2)}
+  .screen::after{content:"";position:absolute;inset:0;z-index:80;pointer-events:none;opacity:.5;mix-blend-mode:multiply;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='0.09'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E")}
+  .island{position:absolute;top:10px;left:50%;transform:translateX(-50%);width:112px;height:30px;background:#141416;border-radius:20px;z-index:82}
+  .statusbar{position:absolute;top:0;left:0;right:0;height:46px;display:flex;align-items:center;justify-content:space-between;padding:14px 26px 0;z-index:83;font-size:13.5px;font-weight:600;color:var(--ink)}
+  .statusbar .icons{display:flex;gap:5px;align-items:center}
+
+  .mp-nav{position:absolute;top:46px;left:0;right:0;height:44px;display:flex;align-items:center;justify-content:center;z-index:60}
+  .mp-nav .title{font-size:16.5px;font-weight:600;color:var(--ink);letter-spacing:2px}
+  .capsule{position:absolute;right:12px;top:7px;width:88px;height:32px;border:1.5px solid rgba(38,34,28,.35);background:rgba(246,238,217,.6);border-radius:3px;display:flex;align-items:center;justify-content:center;z-index:61}
+  .capsule span{flex:1;text-align:center;font-size:15px;color:rgba(38,34,28,.6);line-height:1}
+  .capsule i{width:1px;height:16px;background:rgba(38,34,28,.3)}
+
+  .pages{position:absolute;top:90px;bottom:64px;left:0;right:0}
+  .page{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;padding:0 14px 24px;display:none;scrollbar-width:none}
+  .page::-webkit-scrollbar{display:none}
+  .page.active{display:block;animation:fade .22s ease}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+
+  .card{background:var(--paper);border:2px solid var(--ink);box-shadow:var(--sh)}
+  .chipbar{display:flex;gap:8px;overflow-x:auto;padding:12px 2px;scrollbar-width:none}
+  .chipbar::-webkit-scrollbar{display:none}
+  .chip{flex:none;font-size:12px;padding:6px 13px;background:var(--paper);border:1.5px solid var(--ink);color:#6b6152;border-radius:2px;cursor:pointer}
+  .chip:active{transform:translate(1px,1px)}
+  .chip.on{background:var(--red);border-color:var(--red);color:var(--paper);font-weight:600}
+  .sec-title{display:flex;align-items:baseline;justify-content:space-between;margin:20px 2px 10px}
+  .sec-title h3{font-size:17px;color:var(--ink);letter-spacing:2px;font-weight:900;}
+  .sec-title h3::before{content:"";display:inline-block;width:7px;height:7px;background:var(--red);margin-right:9px;box-shadow:1.5px 1.5px 0 rgba(36,66,92,.5)}
+  .sec-title a{font-size:11px;color:var(--faint);text-decoration:none}
+  .btn{display:block;width:100%;border:none;border-radius:2px;padding:13px;font-size:14.5px;font-weight:600;background:var(--red);color:var(--paper);cursor:pointer;letter-spacing:4px}
+  .btn:active{background:var(--red-deep);transform:translate(1px,1px)}
+  .btn.ghost{background:var(--paper);color:var(--red);border:1.5px solid var(--red)}
+
+  /* ===== 首页 ===== */
+  .seal{width:36px;height:36px;background:var(--red);color:var(--paper);font-size:12.5px;line-height:1.15;display:flex;align-items:center;justify-content:center;text-align:center;font-family:"KaiTi","STKaiti",serif;box-shadow:1.5px 1.5px 0 rgba(38,34,28,.5)}
+  .hero{border:2.5px solid var(--ink);position:relative;background:var(--paper);height:250px;margin-top:6px;box-shadow:var(--sh)}
+  .hero::before{content:"";position:absolute;inset:5px;border:1px solid var(--ink);pointer-events:none;z-index:2}
+  .hero .vt{position:absolute;left:13px;top:14px;writing-mode:vertical-rl;font-size:15px;letter-spacing:7px;color:var(--ink);z-index:3}
+  .hero svg.fish{position:absolute;right:4px;top:14px;width:212px}
+  .hero .seal{position:absolute;right:16px;bottom:38px;z-index:3}
+  .hero .cap{position:absolute;left:0;right:0;bottom:0;background:var(--ink);color:#e9dcc0;font-size:10px;letter-spacing:2px;padding:6px 12px;white-space:nowrap;overflow:hidden;z-index:2}
+  .quick{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+  .quick a{background:var(--paper);border:2px solid var(--ink);border-radius:2px;padding:11px 6px;text-align:center;text-decoration:none;color:var(--ink)}
+  .quick a:active{background:var(--paper2);transform:translate(1px,1px)}
+  .quick .qi{width:28px;height:28px;margin:0 auto 8px;display:flex;align-items:center;justify-content:center}
+  .quick .qi svg{width:24px;height:24px}
+  .quick b{display:block;font-size:12.5px;letter-spacing:1px}
+  .quick span{font-size:9.5px;color:var(--faint)}
+  .exp-scroll{display:flex;gap:12px;overflow-x:auto;padding:2px 2px 6px;scrollbar-width:none}
+  .exp-scroll::-webkit-scrollbar{display:none}
+  .exp-card{flex:none;width:172px;background:var(--paper);border:2px solid var(--ink);border-radius:2px;overflow:hidden;position:relative;box-shadow:2px 2px 0 rgba(36,66,92,.75)}
+  .exp-card .stamp{position:absolute;top:-2px;left:-2px;z-index:3;background:var(--red);color:var(--paper);writing-mode:vertical-rl;font-size:10px;letter-spacing:3px;padding:6px 4px;font-family:"KaiTi","STKaiti",serif;box-shadow:1.5px 1.5px 0 rgba(38,34,28,.45)}
+  .exp-card .thumb{height:96px;border-bottom:1.5px solid var(--ink);position:relative;background:var(--paper)}
+  .exp-card .thumb svg{width:100%;height:100%}
+  .exp-card .ib{padding:9px 11px 11px}
+  .exp-card .ib b{display:block;font-size:14px;color:var(--ink);letter-spacing:1px;font-weight:600}
+  .exp-card .ib i{display:block;font-style:normal;font-size:10px;color:var(--faint);margin:4px 0 7px;padding-bottom:6px;border-bottom:1px dashed var(--line)}
+  .exp-card .ib .pr{display:flex;align-items:center;gap:5px}
+  .exp-card .ib .pr b{font-size:17px;color:var(--red);font-weight:900;}
+  .exp-card .ib .pr s{font-size:9.5px;color:#a3966f}
+  .exp-card .ib .pr span{margin-left:auto;font-size:9px;color:var(--faint)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .good{background:var(--paper);border:2px solid var(--ink);border-radius:2px;overflow:hidden;position:relative}
+  .good .thumb{height:118px;display:block;border-bottom:1.5px solid var(--ink)}
+  .good .thumb svg{width:100%;height:100%}
+  .good .gb{padding:8px 10px 10px}
+  .good .gb b{display:block;font-size:12.5px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:.5px}
+  .good .gb i{font-style:normal;font-size:9.5px;color:var(--faint);letter-spacing:1px}
+  .good .gb .row{display:flex;justify-content:space-between;align-items:center;margin-top:5px}
+  .good .price{font-size:15px;color:var(--red);font-weight:900;}
+  .good .price em{font-style:normal;font-size:10px}
+  .cart-btn{width:25px;height:25px;border:1.5px solid var(--ink);background:var(--red);color:var(--paper);font-size:14px;line-height:1;cursor:pointer;border-radius:2px;font-family:serif}
+  .cart-btn:active{transform:translate(1px,1px);background:var(--red-deep)}
+  .store{display:flex;align-items:center;gap:11px;padding:13px 14px;margin-top:20px;border-radius:2px;box-shadow:none}
+  .store .ico{width:38px;height:38px;flex:none;display:flex;align-items:center;justify-content:center;color:var(--red)}
+  .store .ico svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .store b{display:block;font-size:13.5px;color:var(--ink);letter-spacing:1px}
+  .store i{font-style:normal;font-size:10.5px;color:var(--faint);display:block;margin-top:2px}
+  .store .go{margin-left:auto;flex:none;font-size:11px;color:var(--red);border:1.5px solid var(--red);padding:5px 11px;border-radius:2px;background:var(--paper);letter-spacing:1px}
+  .foot-note{text-align:center;font-size:9.5px;color:#95866a;margin:18px 0 4px;letter-spacing:2px}
+
+  /* ===== 体验页 ===== */
+  .exp-item{display:flex;gap:12px;padding:12px;margin-bottom:12px;border-radius:2px}
+  .exp-item .thumb{width:96px;height:96px;flex:none;border:1.5px solid var(--ink);border-radius:2px;overflow:hidden}
+  .exp-item .thumb svg{width:100%;height:100%}
+  .exp-item .ei{flex:1;min-width:0;display:flex;flex-direction:column}
+  .exp-item .ei>b{font-size:15px;color:var(--ink);letter-spacing:1px;font-weight:600}
+  .exp-item .meta{font-size:10.5px;color:var(--faint);margin:5px 0 6px;padding-bottom:6px;border-bottom:1px dashed var(--line)}
+  .exp-item .tags{display:flex;gap:5px;margin-bottom:auto}
+  .exp-item .tags span{font-size:9.5px;color:var(--indigo);border:1px solid rgba(36,66,92,.4);border-radius:2px;padding:1.5px 5px}
+  .exp-item .bot{display:flex;justify-content:space-between;align-items:flex-end;margin-top:6px}
+  .exp-item .price{font-size:18px;color:var(--red);font-weight:900;}
+  .exp-item .price em{font-style:normal;font-size:10px}
+  .book-btn{border:1.5px solid var(--ink);background:var(--red);color:var(--paper);font-size:12px;padding:7px 15px;border-radius:2px;cursor:pointer;font-weight:600;letter-spacing:2px}
+  .book-btn:active{transform:translate(1px,1px);background:var(--red-deep)}
+  .banner-ai{border:2px solid var(--ink);border-radius:2px;overflow:hidden;position:relative;margin-top:16px;box-shadow:var(--sh)}
+  .banner-ai svg{display:block;width:100%;height:auto}
+  .banner-ai .cap{position:absolute;top:12px;left:14px;right:14px;color:var(--paper)}
+  .banner-ai .cap b{font-size:16px;letter-spacing:2px;font-weight:900}
+  .banner-ai .cap p{font-size:10px;opacity:.92;margin-top:4px;letter-spacing:1px}
+
+  /* ===== 好物页 ===== */
+  .feat{position:relative;border:2px solid var(--ink);border-radius:2px;overflow:hidden;margin-bottom:14px;box-shadow:var(--sh)}
+  .feat svg{display:block;width:100%;height:auto}
+  .feat .cap{position:absolute;left:14px;bottom:12px;color:var(--paper)}
+  .feat .cap b{font-size:17px;letter-spacing:2px;font-weight:900}
+  .feat .cap p{font-size:10px;opacity:.9;margin-top:2px;letter-spacing:1px}
+  .feat .num{position:absolute;top:10px;right:10px;font-size:10px;color:var(--paper);background:var(--red);padding:3px 8px;border-radius:2px;letter-spacing:1px;border:1px solid rgba(246,238,217,.4)}
+  .cart-bar{position:sticky;bottom:10px;z-index:5;width:100%;display:flex;align-items:center;gap:10px;border:2px solid var(--ink);background:var(--paper);border-radius:2px;padding:9px 12px;margin-top:14px;cursor:pointer;box-shadow:0 6px 16px rgba(30,20,10,.25)}
+  .cart-bar:active{transform:translate(1px,1px)}
+  .cart-bar .cbd{flex:none;min-width:20px;height:20px;background:var(--red);color:var(--paper);border:1.5px solid var(--ink);border-radius:2px;font-size:10.5px;display:flex;align-items:center;justify-content:center;padding:0 5px}
+  .cart-bar .cbt{font-size:12.5px;color:var(--ink)}
+  .cart-bar .cbt b{font-weight:900;color:var(--red)}
+  .cart-bar .go{margin-left:auto;font-size:11.5px;letter-spacing:2px;background:var(--red);color:var(--paper);border:1.5px solid var(--ink);border-radius:2px;padding:6px 13px;font-weight:600}
+
+  /* ===== 我的 ===== */
+  .me-head{display:flex;align-items:center;gap:12px;padding:16px 4px 14px}
+  .me-head .ava{width:50px;height:50px;border-radius:2px;background:var(--red);color:var(--paper);display:flex;align-items:center;justify-content:center;font-size:22px;font-family:"KaiTi","STKaiti",serif;box-shadow:2px 2px 0 rgba(38,34,28,.55)}
+  .me-head b{display:block;font-size:17px;color:var(--ink);letter-spacing:1px}
+  .me-head span{font-size:10.5px;color:var(--faint)}
+  .vip{border:2px solid var(--ink);border-radius:2px;background:var(--paper);box-shadow:2.5px 2.5px 0 rgba(140,42,31,.65);overflow:hidden;text-align:left}
+  .vip .vh{background:var(--red);color:var(--paper);padding:10px 14px;display:flex;justify-content:space-between;align-items:center}
+  .vip .vh b{font-size:15px;letter-spacing:2px;font-weight:900}
+  .vip .vh span{font-size:9.5px;letter-spacing:1px;opacity:.9}
+  .vip .vb{padding:10px 14px;font-size:10.5px;color:var(--faint);display:flex;justify-content:space-between;letter-spacing:1px}
+  .coupons{display:flex;gap:10px;margin-top:12px}
+  .coupon{flex:1;border:1.5px dashed var(--indigo);background:var(--paper);border-radius:2px;padding:10px;text-align:center;position:relative}
+  .coupon::before,.coupon::after{content:"";position:absolute;width:8px;height:8px;background:var(--paper2);border:1.5px solid var(--indigo);border-radius:50%;top:50%;transform:translateY(-50%)}
+  .coupon::before{left:-6px}.coupon::after{right:-6px}
+  .coupon b{font-size:17px;color:var(--red);font-weight:900}
+  .coupon b em{font-style:normal;font-size:10px}
+  .coupon i{font-style:normal;display:block;font-size:9.5px;color:var(--faint);margin-top:3px}
+  .menu{background:var(--paper);border:2px solid var(--ink);border-radius:2px;margin-top:14px;overflow:hidden}
+  .menu a{display:flex;align-items:center;gap:10px;padding:12.5px 14px;text-decoration:none;color:var(--ink);font-size:13px;border-bottom:1px dashed var(--line);letter-spacing:1px}
+  .menu a:last-child{border-bottom:none}
+  .menu a:active{background:var(--paper2)}
+  .menu .mi{width:25px;height:25px;display:flex;align-items:center;justify-content:center;color:var(--red)}
+  .menu .mi svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .menu .arr{margin-left:auto;color:var(--faint);font-size:13px}
+  .mi svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .ico svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+  /* ===== 详情面板 ===== */
+  .dt-hero{margin:14px 16px 0;border:2px solid var(--ink);background:var(--paper);position:relative;box-shadow:2.5px 2.5px 0 rgba(36,66,92,.85);flex:none}
+  .dt-hero::before{content:"";position:absolute;inset:4px;border:1px solid var(--ink);pointer-events:none;z-index:2}
+  .dt-hero svg{display:block;width:100%;height:auto}
+  .dt-body{flex:1 1 auto;min-height:0;padding:14px 16px 8px;overflow-y:auto;scrollbar-width:none}
+  .dt-body::-webkit-scrollbar{display:none}
+  .dt-title{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+  .dt-title b{font-size:18px;color:var(--ink);letter-spacing:1px;font-weight:600}
+  .dt-title .pr{font-size:20px;color:var(--red);font-weight:900;white-space:nowrap}
+  .dt-title .pr i{font-style:normal;font-size:10px}
+  .dt-sub{font-size:10.5px;color:var(--faint);margin-top:5px;letter-spacing:1px}
+  .dt-desc{font-size:12px;color:#55503f;line-height:1.9;margin:10px 0 2px}
+  .dt-cap{font-size:11px;color:var(--ink);font-weight:600;margin:14px 2px 8px;letter-spacing:2px;display:flex;align-items:center;gap:8px}
+  .dt-cap::before{content:"";width:5px;height:5px;background:var(--red);box-shadow:1px 1px 0 rgba(36,66,92,.5)}
+  .dt-steps{display:flex;gap:6px}
+  .dt-steps span{flex:1;text-align:center;border:1.5px solid var(--ink);background:var(--paper);border-radius:2px;padding:7px 0;font-size:11.5px;font-family:"KaiTi","STKaiti",serif;letter-spacing:1px}
+  .dt-rows div{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px dashed var(--line);font-size:11.5px;color:var(--faint)}
+  .dt-rows div b{font-weight:400;color:var(--ink);text-align:right}
+  .dt-cta{display:flex;align-items:center;gap:14px;padding:12px 16px calc(14px + env(safe-area-inset-bottom));border-top:2px solid var(--ink);background:var(--paper);flex:none}
+  .dt-cta .p{font-size:19px;color:var(--red);font-weight:900;}
+  .dt-cta .p i{font-style:normal;font-size:10px}
+  .dt-cta .btn{flex:1;width:auto;padding:11px}
+
+  /* ===== tabbar：单字方章 ===== */
+  .tabbar{position:absolute;bottom:0;left:0;right:0;height:calc(64px + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);background:var(--paper);border-top:2px solid var(--ink);display:flex;z-index:65}
+  .tabbar button{flex:1;border:none;background:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:#8d8069;font-size:10px;position:relative;letter-spacing:1px}
+  .tabbar .ts{width:26px;height:26px;display:flex;align-items:center;justify-content:center}
+  .tabbar .ts svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+  .tabbar button.on{color:var(--red);font-weight:600}
+  .tabbar button:active .ts{transform:translate(1px,1px)}
+  .tabbar .bdg{position:absolute;top:4px;right:calc(50% - 24px);min-width:15px;height:15px;background:var(--red);color:var(--paper);font-size:9px;border-radius:2px;display:none;align-items:center;justify-content:center;padding:0 4px;border:1.5px solid var(--ink);cursor:pointer}
+  .homebar{position:absolute;bottom:5px;left:50%;transform:translateX(-50%);width:120px;height:4px;background:#1c1c1e;border-radius:99px;opacity:.85;z-index:66}
+
+  /* ===== 预约/购物车面板 ===== */
+  .overlay{position:absolute;inset:0;background:rgba(24,18,10,.5);opacity:0;pointer-events:none;transition:.25s;z-index:70}
+  .overlay.show{opacity:1;pointer-events:auto}
+  .sheet{position:absolute;left:0;right:0;bottom:0;background:var(--paper2);border-top:2.5px solid var(--ink);transform:translateY(105%);transition:.3s cubic-bezier(.32,.72,.28,1);z-index:71;max-height:92%;display:flex;flex-direction:column}
+  .sheet.show{transform:none}
+  .sheet-head{display:flex;align-items:center;padding:15px 16px 12px;border-bottom:2px solid var(--ink);background:var(--paper)}
+  .sheet-head .sh{width:54px;height:54px;border:1.5px solid var(--ink);border-radius:2px;overflow:hidden;flex:none}
+  .sheet-head .sh svg{width:100%;height:100%}
+  .sheet-head .st{margin-left:11px}
+  .sheet-head b{display:block;font-size:16px;color:var(--ink);letter-spacing:1px;font-weight:600}
+  .sheet-head i{font-style:normal;font-size:10.5px;color:var(--faint)}
+  .sheet-head .price{margin-left:auto;text-align:right;font-size:19px;color:var(--red);font-weight:900;}
+  .sheet-head .price em{font-style:normal;font-size:10px}
+  .sheet-body{padding:4px 16px 8px;overflow-y:auto;scrollbar-width:none}
+  .sheet-body::-webkit-scrollbar{display:none}
+  .f-label{font-size:12.5px;color:var(--ink);font-weight:600;margin:11px 2px 8px;letter-spacing:1px}
+  .f-label span{color:var(--faint);font-weight:400;font-size:10.5px;margin-left:6px}
+  .slots{display:flex;flex-wrap:wrap;gap:8px}
+  .slots button{border:1.5px solid var(--ink);background:var(--paper);border-radius:2px;padding:6px 12px;font-size:12px;color:#6b6152;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:74px}
+  .slots button i{font-style:normal;font-size:9px;color:var(--faint);letter-spacing:1px}
+  .slots button.on{background:var(--red);border-color:var(--red);color:var(--paper);font-weight:600}
+  .slots button.on i{color:var(--paper);opacity:.9}
+  .slots button.full{opacity:.5}
+  .slots button.full i{color:var(--red);font-weight:600}
+  .stepper{display:inline-flex;align-items:center;border:1.5px solid var(--ink);background:var(--paper);border-radius:2px;overflow:hidden}
+  .stepper button{width:30px;height:30px;border:none;background:none;font-size:14px;color:var(--ink);cursor:pointer;font-family:serif}
+  .stepper button:active{background:var(--paper2)}
+  .stepper b{width:34px;text-align:center;font-size:13.5px;border-left:1px dashed var(--line);border-right:1px dashed var(--line);align-self:stretch;display:flex;align-items:center;justify-content:center}
+  .stepper.sm button{width:24px;height:24px;font-size:12px}
+  .stepper.sm b{width:26px;font-size:12px}
+  .inp{width:100%;border:1.5px solid var(--ink);background:var(--paper);border-radius:2px;padding:10px 12px;font-size:13px;color:var(--ink);outline:none;font-family:inherit}
+  .inp:focus{border-color:var(--red);box-shadow:2px 2px 0 rgba(168,50,38,.35)}
+  .sheet-foot{padding:12px 16px calc(22px + env(safe-area-inset-bottom));border-top:1px dashed var(--line)}
+  .success{display:none;text-align:center;padding:26px 20px 10px}
+  .success .ok{width:60px;height:60px;border-radius:2px;background:var(--indigo);margin:0 auto 14px;display:flex;align-items:center;justify-content:center;box-shadow:2px 2px 0 rgba(38,34,28,.6)}
+  .success .ok svg{width:28px;height:28px}
+  .success h4{font-size:19px;color:var(--ink);letter-spacing:4px;font-weight:900}
+  .success p{font-size:11.5px;color:var(--faint);margin:8px 0 16px;line-height:1.7}
+  .qr{width:150px;height:150px;margin:0 auto 6px;background:var(--paper);border:2px solid var(--ink);border-radius:2px;padding:9px;display:grid;grid-template-columns:repeat(11,1fr);grid-template-rows:repeat(11,1fr);gap:1px;box-shadow:2px 2px 0 rgba(36,66,92,.5)}
+  .qr i{background:var(--ink)}
+  .qr i.o{background:transparent}
+  .success .code{font-size:12px;letter-spacing:3px;color:var(--ink);margin:10px 0 16px;font-weight:600}
+  .success .fine{font-size:9.5px;color:#a3966f;margin-top:12px;letter-spacing:1px}
+
+  /* 购物车面板 */
+  .cart-head{padding:14px 16px;border-bottom:2px solid var(--ink);background:var(--paper);display:flex;justify-content:space-between;align-items:baseline}
+  .cart-head b{font-size:16px;letter-spacing:2px;font-weight:900}
+  .cart-head span{font-size:10.5px;color:var(--faint)}
+  .cart-items{overflow-y:auto;padding:4px 16px;scrollbar-width:none}
+  .cart-items::-webkit-scrollbar{display:none}
+  .ci{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px dashed var(--line);font-size:12.5px;color:var(--ink)}
+  .ci .nm{flex:1;min-width:0}
+  .ci .nm b{display:block;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ci .nm i{font-style:normal;font-size:9.5px;color:var(--faint)}
+  .ci .lp{width:58px;text-align:right;color:var(--red);font-weight:900}
+  .ci .rm{border:none;background:none;color:var(--faint);font-size:13px;cursor:pointer;padding:2px 4px}
+  .ci .rm:active{color:var(--red)}
+  .cart-empty{text-align:center;color:#a3966f;font-size:12px;padding:34px 0;letter-spacing:2px}
+  .cart-foot{padding:12px 16px calc(22px + env(safe-area-inset-bottom));border-top:1px dashed var(--line);display:flex;align-items:center;gap:14px}
+  .cart-foot .ct{font-size:12px;color:var(--faint)}
+  .cart-foot .ct b{font-size:19px;color:var(--red);font-weight:900;margin-left:4px}
+  .cart-foot .btn{flex:1;width:auto;padding:11px}
+
+  .toast{position:absolute;left:50%;top:46%;transform:translate(-50%,-50%) scale(.94);background:var(--ink);color:#e9dcc0;font-size:12.5px;padding:12px 20px;border-radius:2px;opacity:0;pointer-events:none;transition:.25s;z-index:90;white-space:nowrap;box-shadow:2px 2px 0 rgba(36,66,92,.7);letter-spacing:1px}
+  .toast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+
+  /* 矮屏缩放：笔记本上完整看到整台手机 */
+  @media (max-height:960px){ body{align-items:flex-start} .phone-wrap{transform:scale(.82);transform-origin:top center;margin-bottom:-170px} }
+
+  /* ===== 真机全屏（微信内置浏览器直接打开时去壳） ===== */
+  @media (max-width:480px){
+    body{padding:0;display:block;min-height:100dvh;background:#151310}
+    .pitch,.caption{display:none}
+    .phone{width:100vw;height:100dvh;border-radius:0;padding:0;box-shadow:none}
+    .screen{border-radius:0}
+    .island{display:none}
+  }
+</style>
+</head>
+<body>
+
+<aside class="pitch">
+  <span class="tag">V2.1 · 套版印画</span>
+  <h1 class="serif">柳青画庄<br><em>界面即版画</em></h1>
+  <p>演示动线：先「体验预约」讲场次和收钱 → 再「非遗好物」加购、结算 → 最后讲 AI 新年画的卖法。</p>
+  <ul>
+    <li><b>场次余量</b>每场 6 位，"仅剩 2 位"是转化钩子</li>
+    <li><b>购物车可结算</b>角标和"去结算"都能点到底</li>
+    <li><b>占位图说明</b>演示图形为占位，上线替换为客户实拍作品（顺带可谈拍摄服务）</li>
+  </ul>
+  <div class="foot">数据均为虚构演示用，配置集中在 config.js。<br>交付版将替换为客户真实素材与资质。</div>
+</aside>
+
+<div class="phone-wrap">
+<div class="phone">
+  <div class="screen">
+    <div class="island"></div>
+    <div class="statusbar">
+      <span>9:41</span>
+      <span class="icons" aria-hidden="true">
+        <svg width="16" height="11" viewBox="0 0 16 11"><g fill="#26221c"><rect x="0" y="7" width="3" height="4" rx="1"/><rect x="4.5" y="5" width="3" height="6" rx="1"/><rect x="9" y="2.5" width="3" height="8.5" rx="1"/><rect x="13" y="0" width="3" height="11" rx="1" opacity=".35"/></g></svg>
+        <svg width="15" height="11" viewBox="0 0 15 11"><path d="M7.5 9.5 L5.3 7.2 a3.4 3.4 0 0 1 4.4 0 Z M2.9 4.9 a6.6 6.6 0 0 1 9.2 0 L10.8 6.3 a4.8 4.8 0 0 0 -6.6 0 Z M.6 2.6 a9.9 9.9 0 0 1 13.8 0 L13 4 a7.9 7.9 0 0 0 -11 0 Z" fill="#26221c"/></svg>
+        <svg width="23" height="11" viewBox="0 0 23 11"><rect x="0" y="0" width="20" height="11" rx="2" fill="none" stroke="#26221c" opacity=".4"/><rect x="1.8" y="1.8" width="13" height="7.4" rx="1" fill="#26221c"/><rect x="21" y="3.4" width="2" height="4.2" rx="1" fill="#26221c" opacity=".4"/></svg>
+      </span>
+    </div>
+
+    <div class="mp-nav">
+      <span class="title serif" id="navTitle">柳青画庄</span>
+      <div class="capsule"><span>•••</span><i></i><span>◎</span></div>
+    </div>
+
+    <div class="pages">
+
+      <!-- ============ 首页 ============ -->
+      <section class="page active" id="page-home">
+        <div class="hero">
+          <div class="vt kai" aria-hidden="true">連年有餘</div>
+          <svg class="fish" viewBox="0 0 270 160" role="img" aria-label="连年有余 · 木版年画">
+            <g filter="url(#rough)">
+              <path d="M30,88 C55,52 130,44 185,62 C212,71 228,82 233,88 C210,102 160,116 105,116 C70,116 44,104 30,88 Z M225,88 C244,68 258,62 266,60 C258,78 258,98 266,114 C256,110 242,102 225,88 Z" fill="#24425c" transform="translate(5,5)" opacity=".9"/>
+              <path d="M30,88 C55,52 130,44 185,62 C212,71 228,82 233,88 C210,102 160,116 105,116 C70,116 44,104 30,88 Z M225,88 C244,68 258,62 266,60 C258,78 258,98 266,114 C256,110 242,102 225,88 Z" fill="#a83226"/>
+              <path d="M120,52 C136,38 158,40 168,50 C152,52 136,58 126,64 Z" fill="#d9a441"/>
+            </g>
+            <circle cx="52" cy="80" r="4.5" fill="#f6eed9"/><circle cx="53.5" cy="80" r="2.2" fill="#26221c"/>
+            <g fill="none" stroke="#f6eed9" stroke-width="2" opacity=".9" filter="url(#rough)">
+              <path d="M85,74 a9,9 0 0 1 18,0"/><path d="M112,68 a9,9 0 0 1 18,0"/><path d="M139,66 a9,9 0 0 1 18,0"/><path d="M166,70 a9,9 0 0 1 18,0"/>
+              <path d="M99,92 a9,9 0 0 1 18,0"/><path d="M126,88 a9,9 0 0 1 18,0"/><path d="M153,88 a9,9 0 0 1 18,0"/>
+            </g>
+            <g fill="none" stroke="#24425c" stroke-width="2.5" opacity=".8">
+              <path d="M10,140 q14,-8 28,0 t28,0 t28,0 t28,0 t28,0 t28,0 t28,0 t28,0"/>
+              <path d="M22,152 q14,-6 28,0 t28,0 t28,0 t28,0 t28,0 t28,0 t28,0" stroke-width="1.8" opacity=".55"/>
+            </g>
+          </svg>
+          <div class="seal" id="hero-seal">柳青<br>画庄</div>
+          <div class="cap">勾 · 刻 · 印 · 绘 · 裱 —— 五道工序全手工</div>
+        </div>
+
+        <div class="quick">
+          <a href="javascript:void(0)" data-goto="booking">
+            <span class="qi"><svg viewBox="0 0 24 24" fill="none" stroke="#a83226" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="1"/><path d="M8 3v4M16 3v4M4 10h16"/></svg></span>
+            <b>体验预约</b><span>木版拓印</span>
+          </a>
+          <a href="javascript:void(0)" data-goto="shop">
+            <span class="qi"><svg viewBox="0 0 24 24" fill="none" stroke="#24425c" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8h12l-1.4 11.2a2 2 0 0 1-2 1.8H9.4a2 2 0 0 1-2-1.8L6 8z"/><path d="M9 8a3 3 0 0 1 6 0"/></svg></span>
+            <b>非遗好物</b><span>文创礼盒</span>
+          </a>
+          <a href="javascript:void(0)" data-goto="booking">
+            <span class="qi"><svg viewBox="0 0 24 24" fill="none" stroke="#8a6420" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/><circle cx="12" cy="12" r="3.2"/></svg></span>
+            <b>研学定制</b><span>团体包场</span>
+          </a>
+        </div>
+
+        <div class="sec-title"><h3 class="serif">热门体验</h3><a data-goto="booking">全部 ›</a></div>
+        <div class="exp-scroll" id="home-exps"></div>
+
+        <div class="sec-title"><h3 class="serif">非遗好物</h3><a data-goto="shop">进店 ›</a></div>
+        <div class="grid2" id="home-goods"></div>
+
+        <div class="card store">
+          <span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6.2-5.4-6.2-9.6a6.2 6.2 0 1 1 12.4 0C18.2 15.6 12 21 12 21z"/><circle cx="12" cy="11.2" r="2.2"/></svg></span>
+          <div><b class="serif" id="store-name">柳青画庄 · 古文化街店</b><i id="store-addr">南开区古文化街 ×× 号（演示地址）</i><i id="store-hours">周二至周日 9:30 – 18:00</i></div>
+          <span class="go">导航</span>
+        </div>
+        <p class="foot-note">演示原型 · 虚构数据 · 津 ICP备XXXXXX号 · 柳青画庄（虚构品牌）</p>
+      </section>
+
+      <!-- ============ 体验预约 ============ -->
+      <section class="page" id="page-booking">
+        <div class="chipbar" id="exp-chips">
+          <button class="chip on">全部</button><button class="chip">木版拓印</button><button class="chip">手绘上色</button><button class="chip">亲子研学</button><button class="chip">团体定制</button>
+        </div>
+        <div id="exp-list"></div>
+        <div class="banner-ai">
+          <svg viewBox="0 0 400 110" aria-hidden="true">
+            <rect width="400" height="110" fill="#24425c"/>
+            <g fill="#d9a441" opacity=".92">
+              <rect x="250" y="26" width="8" height="8"/><rect x="266" y="16" width="6" height="6"/><rect x="284" y="36" width="5" height="5"/><rect x="298" y="20" width="9" height="9"/><rect x="318" y="30" width="6" height="6"/><rect x="338" y="14" width="7" height="7"/><rect x="354" y="40" width="5" height="5"/><rect x="372" y="24" width="8" height="8"/>
+            </g>
+            <path d="M0,92 q30,-13 60,0 t60,0 t60,0 t60,0 t60,0 t60,0 t60,0" stroke="#d9a441" stroke-width="3" fill="none" opacity=".8"/>
+            <path d="M38,72 C58,50 94,46 120,56 C102,64 90,74 82,86 Z" fill="#f6eed9" transform="translate(4,4)" opacity=".55"/>
+            <path d="M38,72 C58,50 94,46 120,56 C102,64 90,74 82,86 Z" fill="#a83226"/>
+          </svg>
+          <div class="cap"><b class="serif" id="ai-title">AI 联名 · 运河百景</b><p id="ai-sub">¥199 · 限量 500 幅 · 可定制姓名藏款（演示）</p></div>
+        </div>
+      </section>
+
+      <!-- ============ 好物商城 ============ -->
+      <section class="page" id="page-shop">
+        <div class="feat">
+          <svg viewBox="0 0 400 148" aria-hidden="true">
+            <rect width="400" height="148" fill="#8c2a1f"/>
+            <rect x="8" y="8" width="384" height="132" fill="none" stroke="#d9a441" stroke-width="1.2" opacity=".65"/>
+            <g fill="#d9a441" opacity=".95">
+              <path d="M62,42 C76,22 102,18 120,28 C106,36 98,46 94,58 Z"/>
+              <circle cx="128" cy="30" r="4"/>
+              <path d="M252,102 C268,82 294,78 312,88 C298,96 290,106 286,118 Z"/>
+            </g>
+            <g fill="#f6eedd"><rect x="150" y="32" width="7" height="7"/><rect x="170" y="46" width="5" height="5"/><rect x="196" y="28" width="8" height="8"/><rect x="220" y="42" width="6" height="6"/><rect x="242" y="24" width="5" height="5"/><rect x="268" y="38" width="7" height="7"/></g>
+            <path d="M0,130 q25,-11 50,0 t50,0 t50,0 t50,0 t50,0 t50,0 t50,0 t50,0" stroke="#d9a441" stroke-width="2.5" fill="none" opacity=".7"/>
+          </svg>
+          <span class="num" id="ny-tag">限量 500 幅</span>
+          <div class="cap"><b class="serif" id="ny-title">新春礼盒 · 预售</b><p id="ny-sub">年画+红包+春联 · 春节前发货（演示）</p></div>
+        </div>
+        <div class="chipbar" id="shop-chips">
+          <button class="chip on">全部</button><button class="chip">AI 新年画</button><button class="chip">挂画摆件</button><button class="chip">文创</button><button class="chip">礼盒</button>
+        </div>
+        <div class="grid2" id="shop-goods"></div>
+        <button class="cart-bar" id="cart-bar" style="display:none">
+          <span class="cbd" id="cb-count">0</span>
+          <span class="cbt">已选 <b id="cb-qty">0</b> 件 · 合计 <b class="serif">¥<span id="cb-total">0</span></b></span>
+          <span class="go">去结算</span>
+        </button>
+        <p class="foot-note">满 99 包邮 · 顺丰发货 · 演示数据</p>
+      </section>
+
+      <!-- ============ 我的 ============ -->
+      <section class="page" id="page-me">
+        <div class="me-head">
+          <span class="ava">柳</span>
+          <div><b>画友_8848</b><span>微信用户 · 体验过 2 次</span></div>
+        </div>
+        <div class="vip">
+          <div class="vh"><b class="serif">年画守护人 · 黑金卡</b><span>NO. 2026-008848</span></div>
+          <div class="vb"><span>年度体验 8 折</span><span>新品优先购</span><span>生日礼</span></div>
+        </div>
+        <div class="coupons">
+          <div class="coupon"><b><em>¥</em>15</b><i>体验立减券</i></div>
+          <div class="coupon"><b><em>¥</em>30</b><i>满199可用</i></div>
+        </div>
+        <div class="menu">
+          <a href="javascript:void(0)" data-list="bookings"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="1"/><path d="M8 3v4M16 3v4M4 10.5h16"/></svg></span>我的预约<span class="arr">›</span></a>
+          <a href="javascript:void(0)" data-list="orders"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8l8-4 8 4v8l-8 4-8-4V8z"/><path d="M4 8l8 4 8-4M12 12v8"/></svg></span>商城订单<span class="arr">›</span></a>
+          <a href="javascript:void(0)" data-toast="已复制门店地址（演示）"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6.2-5.4-6.2-9.6a6.2 6.2 0 1 1 12.4 0C18.2 15.6 12 21 12 21z"/><circle cx="12" cy="11.2" r="2.2"/></svg></span>门店信息<span class="arr">›</span></a>
+        </div>
+        <div class="menu">
+          <a href="javascript:void(0)" data-toast="演示环境：客服未接入"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11h-9l-5 4v-4H4z"/></svg></span>联系画庄客服<span class="arr">›</span></a>
+          <a href="javascript:void(0)" data-toast="演示环境"><span class="mi"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 7.6v.5"/></svg></span>关于柳青画庄<span class="arr">›</span></a>
+        </div>
+        <p class="foot-note">柳青画庄 · 虚构演示品牌 · 未经许可请勿商用</p>
+      </section>
+    </div>
+
+    <!-- 预约面板 -->
+    <div class="overlay" id="overlay"></div>
+    <div class="sheet" id="sheet">
+      <div id="sheet-form" style="display:flex;flex-direction:column;max-height:100%">
+        <div class="sheet-head">
+          <span class="sh"><svg viewBox="80 40 232 220" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><use href="#carp-art"/></svg></span>
+          <div class="st"><b class="serif" id="s-title">木版年画拓印</b><i id="s-meta">60分钟 · 含材料</i></div>
+          <div class="price"><em>¥</em><span id="s-price">68</span><em>/人</em></div>
+        </div>
+        <div class="sheet-body">
+          <div class="f-label">选择日期<span>未来 7 天</span></div>
+          <div class="slots" id="date-slots"></div>
+          <div class="f-label">选择场次<span id="cap-note">每场 6 位</span></div>
+          <div class="slots" id="time-slots"></div>
+          <div class="f-label">体验人数</div>
+          <div class="stepper">
+            <button id="dec">−</button><b id="cnt">2</b><button id="inc">＋</button>
+          </div>
+          <div class="f-label">联系人</div>
+          <input class="inp" id="f-name" placeholder="姓名">
+          <input class="inp" id="f-tel" placeholder="手机号" style="margin-top:8px" inputmode="numeric">
+        </div>
+        <div class="sheet-foot">
+          <button class="btn" id="submit">提交预约 · 合计 ¥136</button>
+        </div>
+      </div>
+      <div class="success" id="sheet-ok">
+        <span class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="#f6eed9" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 10 18.5 20 6.5"/></svg></span>
+        <h4 class="serif">预约成功</h4>
+        <p id="ok-info">10月6日 14:00 · 木版年画拓印 · 2人</p>
+        <div class="qr" id="qr" aria-hidden="true"></div>
+        <div class="code">NO. 20261006-0037</div>
+        <button class="btn ghost" id="ok-done">完 成</button>
+        <p class="fine">演示原型 · 未发生真实提交</p>
+      </div>
+    </div>
+
+    <!-- 购物车面板 -->
+    <div class="sheet" id="cart-sheet">
+      <div id="cart-view" style="display:flex;flex-direction:column;max-height:100%">
+        <div class="cart-head"><b class="serif">购物车</b><span id="cart-count">0 件</span></div>
+        <div class="cart-items" id="cart-items"></div>
+        <div class="cart-foot">
+          <span class="ct">合计<b class="serif">¥<span id="cart-total">0</span></b></span>
+          <button class="btn" id="cart-submit">提交订单</button>
+        </div>
+      </div>
+      <div class="success" id="cart-ok">
+        <span class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="#f6eed9" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 10 18.5 20 6.5"/></svg></span>
+        <h4 class="serif">下单成功</h4>
+        <p id="cart-ok-info">2 件 · 合计 ¥167</p>
+        <div class="code" id="cart-code">NO. 20261006-0182</div>
+        <button class="btn ghost" id="cart-done">完 成</button>
+        <p class="fine">演示原型 · 未发生真实交易</p>
+      </div>
+    </div>
+
+    <!-- 预约/订单列表 -->
+    <div class="sheet" id="list-sheet">
+      <div style="display:flex;flex-direction:column;max-height:100%">
+        <div class="cart-head"><b class="serif" id="list-title">我的预约</b><span id="list-count">0 条</span></div>
+        <div class="cart-items" id="list-items"></div>
+        <div class="sheet-foot"><button class="btn ghost" id="list-close">关 闭</button></div>
+      </div>
+    </div>
+
+    <!-- 详情面板 -->
+    <div class="sheet" id="detail-sheet" style="height:88%">
+      <div id="detail-view" style="display:flex;flex-direction:column;height:100%;min-height:0"></div>
+    </div>
+
+    <div class="toast" id="toast">已加入购物车</div>
+
+    <!-- tabbar：方章内嵌图标 -->
+    <nav class="tabbar">
+      <button class="on" data-page="home"><span class="ts"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11 12 4l8 7"/><path d="M6.5 9.5V20h11V9.5"/></svg></span>首页</button>
+      <button data-page="booking"><span class="ts"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="1"/><path d="M8 3v4M16 3v4M4 10.5h16"/></svg></span>体验</button>
+      <button data-page="shop"><span class="ts"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8h12l-1.4 11.2a2 2 0 0 1-2 1.8H9.4a2 2 0 0 1-2-1.8L6 8z"/><path d="M9 8a3 3 0 0 1 6 0"/></svg></span>好物<span class="bdg" id="cart-bdg" style="display:none">0</span></button>
+      <button data-page="me"><span class="ts"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.6"/><path d="M5 20a7.2 7.2 0 0 1 14 0"/></svg></span>我的</button>
+    </nav>
+    <div class="homebar"></div>
+  </div>
+</div>
+<p class="caption" style="color:#6f6552;font-size:11px;margin-top:14px;letter-spacing:2px">柳青画庄 v2.1 · 套版印画（虚构品牌 · 配置见 config.js）</p>
+</div>
+
+<!-- 共用图形与毛边滤镜 -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <filter id="rough" x="-6%" y="-6%" width="112%" height="112%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.18" numOctaves="2" seed="7" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="2.6"/>
+    </filter>
+  </defs>
+  <symbol id="carp-art" viewBox="0 0 400 260">
+    <rect width="400" height="260" fill="var(--paper,#f6eed9)"/>
+    <g stroke="var(--c2,#24425c)" stroke-width="4" fill="none" opacity=".85">
+      <path d="M-12,224 q22,-13 44,0 t44,0 t44,0 t44,0 t44,0 t44,0 t44,0 t44,0 t44,0 t44,0"/>
+      <path d="M-12,242 q22,-12 44,0 t44,0 t44,0 t44,0 t44,0 t44,0 t44,0 t44,0 t44,0 t44,0" stroke-width="3" opacity=".6"/>
+    </g>
+    <circle cx="318" cy="66" r="56" fill="var(--c2,#24425c)"/>
+    <path d="M318,66 L378,24 L384,74 Z" fill="var(--paper,#f6eed9)"/>
+    <circle cx="366" cy="150" r="30" fill="var(--c2,#24425c)" opacity=".85"/>
+    <path d="M366,150 L396,132 L396,158 Z" fill="var(--paper,#f6eed9)"/>
+    <g filter="url(#rough)">
+      <path d="M330,152 C356,120 376,112 388,110 C378,134 378,166 388,192 C372,188 352,180 330,152 Z" fill="var(--c1,#a83226)"/>
+      <path d="M58,148 C92,104 190,92 262,116 C300,128 322,146 330,154 C300,172 238,192 168,192 C118,192 80,176 58,148 Z" fill="var(--c1,#a83226)"/>
+      <path d="M176,96 C198,74 228,76 242,90 C218,92 198,100 184,108 Z" fill="var(--c3,#d9a441)"/>
+      <path d="M148,168 C158,188 178,194 194,190 C178,176 166,170 156,164 Z" fill="var(--c3,#d9a441)"/>
+    </g>
+    <g fill="none" stroke="var(--paper,#f6eed9)" stroke-width="2.4" opacity=".95" filter="url(#rough)">
+      <path d="M128,128 a11,11 0 0 1 22,0"/><path d="M158,120 a11,11 0 0 1 22,0"/><path d="M188,118 a11,11 0 0 1 22,0"/><path d="M218,122 a11,11 0 0 1 22,0"/>
+      <path d="M143,148 a11,11 0 0 1 22,0"/><path d="M173,142 a11,11 0 0 1 22,0"/><path d="M203,142 a11,11 0 0 1 22,0"/><path d="M233,146 a11,11 0 0 1 22,0"/>
+      <path d="M158,168 a11,11 0 0 1 22,0"/><path d="M188,164 a11,11 0 0 1 22,0"/><path d="M218,166 a11,11 0 0 1 22,0"/>
+    </g>
+    <circle cx="88" cy="140" r="6.5" fill="var(--paper,#f6eed9)"/><circle cx="90" cy="140" r="3" fill="#26221c"/>
+    <g transform="translate(18,200)">
+      <rect width="46" height="46" rx="2" fill="var(--c1,#a83226)"/>
+      <text x="23" y="20" font-size="15" fill="#f6eed9" text-anchor="middle" font-family="KaiTi,STKaiti,serif" font-weight="bold">連年</text>
+      <text x="23" y="38" font-size="15" fill="#f6eed9" text-anchor="middle" font-family="KaiTi,STKaiti,serif" font-weight="bold">有餘</text>
+    </g>
+  </symbol>
+  <symbol id="fu-art" viewBox="0 0 400 260">
+    <rect width="400" height="260" fill="#8c2a1f"/>
+    <g fill="none" stroke="#d9a441" stroke-width="2" opacity=".55">
+      <rect x="18" y="18" width="364" height="224" rx="2"/>
+      <rect x="28" y="28" width="344" height="204" rx="1"/>
+    </g>
+    <g fill="#d9a441">
+      <path d="M60,52 l10,14 h-20 Z"/><path d="M340,52 l10,14 h-20 Z"/>
+      <path d="M60,208 l10,-14 h-20 Z"/><path d="M340,208 l10,-14 h-20 Z"/>
+    </g>
+    <g filter="url(#rough)">
+      <rect x="146" y="76" width="108" height="108" rx="2" transform="rotate(45 200 130)" fill="#d9a441"/>
+      <rect x="156" y="86" width="88" height="88" rx="1" transform="rotate(45 200 130)" fill="#a83226"/>
+      <text x="200" y="160" font-size="72" fill="#f6eed9" text-anchor="middle" font-family="KaiTi,STKaiti,serif" font-weight="bold">福</text>
+    </g>
+  </symbol>
+</svg>
+
+<script src="config.js"></script>
+<script>
+/* ================= 数据：config.js 优先，内置兜底 ================= */
+const D = window.FY_CONFIG || {};
+const BRAND = D.brand   || { name:"柳青画庄", seal:["柳青","画庄"], sub:"木版水印 · 天津杨柳青" };
+const STORE = D.store   || { name:"柳青画庄 · 古文化街店", address:"南开区古文化街 ×× 号（演示地址）", hours:"周二至周日 9:30 – 18:00" };
+const AI    = D.aiBanner|| { title:"AI 联名 · 运河百景", sub:"¥199 · 限量 500 幅 · 可定制姓名藏款（演示）" };
+const NY    = D.newYear || { title:"新春礼盒 · 预售", sub:"年画+红包+春联 · 春节前发货（演示）", tag:"限量 500 幅" };
+const SLOTS = D.slots   || [{time:"10:30",left:0},{time:"14:00",left:2},{time:"15:30",left:6}];
+const GOODS = D.goods   || [];
+const EXPS  = D.exps    || [];
+const SYMBOL = sym => sym==="fu" ? "#fu-art" : "#carp-art";
+const esc = s => String(s).replace(/"/g,"&quot;").replace(/</g,"&lt;");
+</script>
+<script>
+/* ====== 主逻辑 ====== */
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+
+/* 品牌信息 */
+(function renderBrand(){
+  document.title = BRAND.name + " v2.1 · 套版印画";
+  $('#navTitle').textContent = BRAND.name;
+  const sealHtml = BRAND.seal.join("<br>");
+  $('#hero-seal').innerHTML = sealHtml;
+  $('#store-name').textContent = STORE.name;
+  $('#store-addr').textContent = STORE.address;
+  $('#store-hours').textContent = STORE.hours;
+  $('#ai-title').textContent = AI.title;
+  $('#ai-sub').textContent = AI.sub;
+  $('#ny-title').textContent = NY.title;
+  $('#ny-sub').textContent = NY.sub;
+  $('#ny-tag').textContent = NY.tag;
+  $('#cap-note').textContent = D.capacityNote || "每场 6 位";
+})();
+
+function goodCard(g,i){
+  return `<div class="good" data-detail="good" data-idx="${i}" style="cursor:pointer">
+    <div class="thumb"><svg viewBox="${g.vb}" preserveAspectRatio="xMidYMid slice" style="${Object.entries(g.vars||{}).map(([k,v])=>`${k}:${v}`).join(';')}" aria-hidden="true"><use href="${SYMBOL(g.sym)}"/></svg></div>
+    <div class="gb"><b>${esc(g.name)}</b><i>${esc(g.tag)}</i>
+      <div class="row"><span class="price"><em>¥</em>${g.price}</span><button class="cart-btn" data-add="${esc(g.name)}" data-price="${g.price}" aria-label="加入购物车">＋</button></div>
+    </div></div>`;
+}
+function expRow(e,i){
+  const vars = e.vars ? ` style="${Object.entries(e.vars).map(([k,v])=>`${k}:${v}`).join(';')}"` : '';
+  return `<div class="card exp-item" data-detail="exp" data-idx="${i}" style="cursor:pointer">
+    <div class="thumb"><svg viewBox="80 40 232 220" preserveAspectRatio="xMidYMid slice"${vars} aria-hidden="true"><use href="#carp-art"/></svg></div>
+    <div class="ei"><b>${esc(e.name)}</b>
+      <span class="meta">${esc(e.dur)} · ${esc(e.inc)}</span>
+      <span class="tags">${e.hot?'<span>热门</span>':''}${e.kid?'<span>亲子友好</span>':''}<span>含材料</span></span>
+      <div class="bot"><span class="price"><em style="font-size:11px;font-style:normal">¥</em>${e.price}${e.price>=1288?'<em style="font-size:10px;font-style:normal"> 起</em>':''}</span>
+      <button class="book-btn" data-book="${esc(e.name)}" data-price="${e.price}" data-meta="${esc(e.dur)} · ${esc(e.inc)}">立即预约</button></div>
+    </div></div>`;
+}
+function renderExp(f){
+  $('#exp-list').innerHTML = EXPS.map((e,i)=>({e,i})).filter(x=>f==='全部'||x.e.cat===f).map(x=>expRow(x.e,x.i)).join('');
+}
+function renderGoods(f, mount){
+  $(mount).innerHTML = GOODS.map((g,i)=>({g,i})).filter(x=>f==='全部'||x.g.tag===f).map(x=>goodCard(x.g,x.i)).join('') ||
+    '<p style="grid-column:1/3;text-align:center;color:#a3966f;font-size:12px;padding:30px 0">该分类暂无商品（演示）</p>';
+}
+renderExp('全部');
+renderGoods('全部', '#shop-goods');
+renderGoods('全部', '#home-goods');
+$('#home-exps').innerHTML = EXPS.map((e,i)=>({e,i})).slice(0,2).map(({e,i})=>{
+  const vars = e.vars ? ` style="${Object.entries(e.vars).map(([k,v])=>`${k}:${v}`).join(';')}"` : '';
+  return `<div class="exp-card" data-detail="exp" data-idx="${i}" style="cursor:pointer">
+    <span class="stamp">${e.hot?'熱門':'親子'}</span>
+    <div class="thumb"><svg viewBox="80 40 232 220" preserveAspectRatio="xMidYMid slice"${vars} aria-hidden="true"><use href="#carp-art"/></svg></div>
+    <div class="ib"><b>${esc(e.name)}</b><i>${esc(e.dur)} · ${esc(e.inc)}</i>
+      <div class="pr"><b>¥${e.price}</b><span>${esc(e.pop)}</span></div>
+    </div></div>`;
+}).join('');
+
+/* ================= 交互 ================= */
+const toast = $('#toast'); let tT;
+function showToast(msg){ toast.textContent = msg; toast.classList.add('show'); clearTimeout(tT); tT=setTimeout(()=>toast.classList.remove('show'),1500); }
+
+const TITLES = {home:BRAND.name, booking:'体验预约', shop:'非遗好物', me:'我的'};
+function go(page){
+  $$('.page').forEach(p=>p.classList.remove('active'));
+  $('#page-'+page).classList.add('active');
+  $$('.tabbar button').forEach(b=>b.classList.toggle('on', b.dataset.page===page));
+  $('#navTitle').textContent = TITLES[page];
+}
+$$('.tabbar button').forEach(b=>b.addEventListener('click',()=>go(b.dataset.page)));
+document.addEventListener('click', e=>{
+  const g = e.target.closest('[data-goto]'); if(g){ go(g.dataset.goto); return; }
+  const l = e.target.closest('[data-list]'); if(l){ openList(l.dataset.list); return; }
+  const d = e.target.closest('[data-detail]'); if(d && !e.target.closest('[data-book],[data-add]')){ openDetail(d.dataset.detail, +d.dataset.idx); return; }
+  const t = e.target.closest('[data-toast]'); if(t){ showToast(t.dataset.toast); }
+});
+
+$$('#exp-chips .chip').forEach(c=>c.addEventListener('click',()=>{
+  $$('#exp-chips .chip').forEach(x=>x.classList.remove('on')); c.classList.add('on'); renderExp(c.textContent);
+}));
+$$('#shop-chips .chip').forEach(c=>c.addEventListener('click',()=>{
+  $$('#shop-chips .chip').forEach(x=>x.classList.remove('on')); c.classList.add('on'); renderGoods(c.textContent, '#shop-goods');
+}));
+
+/* ================= 面板管理 ================= */
+const overlay=$('#overlay'), sheet=$('#sheet'), cartSheet=$('#cart-sheet'), listSheet=$('#list-sheet'), detailSheet=$('#detail-sheet');
+const screenEl=document.querySelector('.screen');
+/* 兜底：绝不允许屏幕容器被程序化滚动（键盘弹出/焦点跳转会把绝对定位面板顶出） */
+screenEl.addEventListener('scroll',()=>{ screenEl.scrollTop=0; screenEl.scrollLeft=0; });
+function openSheet(el){ screenEl.scrollTop=0; screenEl.scrollLeft=0; [sheet,cartSheet,listSheet,detailSheet].forEach(s=>s.classList.remove('show')); el.classList.add('show'); overlay.classList.add('show'); }
+function closeSheets(){ [sheet,cartSheet,listSheet,detailSheet].forEach(s=>s.classList.remove('show')); overlay.classList.remove('show'); }
+overlay.addEventListener('click', closeSheets);
+
+/* ================= 预约 ================= */
+let cur={name:'木版年画拓印', price:68, meta:'', cnt:2};
+document.addEventListener('click', e=>{
+  const b=e.target.closest('[data-book]'); if(!b) return;
+  cur={name:b.dataset.book, price:+b.dataset.price, meta:b.dataset.meta, cnt:2};
+  $('#s-title').textContent=cur.name; $('#s-meta').textContent=cur.meta; $('#s-price').textContent=cur.price;
+  $('#sheet-form').style.display='flex'; $('#sheet-ok').style.display='none';
+  openSheet(sheet);
+});
+
+const dS=$('#date-slots');
+for(let i=1;i<=7;i++){
+  const d=new Date(Date.now()+i*864e5);
+  const b=document.createElement('button');
+  b.innerHTML = i===1?'明天':`${d.getMonth()+1}月${d.getDate()}日`;
+  dS.appendChild(b);
+}
+dS.addEventListener('click', e=>{ if(e.target.tagName==='BUTTON'){ $$('#date-slots button').forEach(x=>x.classList.remove('on')); e.target.classList.add('on'); } });
+$$('#date-slots button')[3].classList.add('on');
+
+/* 场次：容量与满位 */
+const tS=$('#time-slots');
+tS.innerHTML = SLOTS.map(s=>{
+  const cls = s.left<=0 ? ' full' : (s.time==='14:00'?' on':'');
+  const note = s.left<=0 ? '已满' : (s.left<=2 ? `仅剩 ${s.left} 位` : '有位');
+  return `<button class="slot${cls}" data-left="${s.left}"><b>${s.time}</b><i>${note}</i></button>`;
+}).join('');
+tS.addEventListener('click', e=>{
+  const b=e.target.closest('button'); if(!b) return;
+  if(b.classList.contains('full')){ showToast('演示：该场次已满，请选其他时间'); return; }
+  $$('#time-slots button').forEach(x=>x.classList.remove('on')); b.classList.add('on');
+});
+
+function total(){ return cur.price*cur.cnt; }
+function sync(){ $('#cnt').textContent=cur.cnt; $('#submit').textContent=`提交预约 · 合计 ¥${total()}`; }
+$('#inc').addEventListener('click',()=>{ cur.cnt=Math.min(6,cur.cnt+1); sync(); });
+$('#dec').addEventListener('click',()=>{ cur.cnt=Math.max(1,cur.cnt-1); sync(); });
+
+$('#submit').addEventListener('click',()=>{
+  const name=$('#f-name').value.trim(), tel=$('#f-tel').value.trim();
+  if(!name||!/^1\d{10}$/.test(tel)){ showToast('演示提示：请填姓名和 11 位手机号'); return; }
+  const time=$('#time-slots .on')?.querySelector('b')?.textContent||'14:00';
+  const date=$('#date-slots .on')?.textContent||'';
+  $('#ok-info').textContent=`${date} ${time} · ${cur.name} · ${cur.cnt}人`;
+  const m=date.match(/(\d+)月(\d+)日/);
+  const code=`NO. 2026${m?String(m[1]).padStart(2,'0')+String(m[2]).padStart(2,'0'):'1006'}-0037`;
+  document.querySelector('#sheet-ok .code').textContent=code;
+  BOOKINGS.unshift({date,time,cnt:cur.cnt,name,item:cur.name,code});
+  $('#sheet-form').style.display='none';
+  $('#sheet-ok').style.display='block';
+  drawQR();
+});
+$('#ok-done').addEventListener('click',()=>{ closeSheets(); go('home'); showToast('演示结束 · 未发生真实提交'); });
+
+function drawQR(){
+  const q=$('#qr'); q.innerHTML='';
+  const seed=[1,0,1,1,0,1,1, 1,1,0,1,0,0,1, 0,1,1,0,1,1,0, 1,0,0,1,1,0,1, 1,1,1,0,0,1,1, 0,1,0,1,1,0,0, 1,1,0,1,0,1,1];
+  for(let r=0;r<11;r++)for(let c=0;c<11;c++){
+    const i=document.createElement('i');
+    const corner=(r<3&&c<3)||(r<3&&c>7)||(r>7&&c<3);
+    i.className = corner ? (r===1&&c===1||r===1&&c===9||r===9&&c===1?'o':'') : (seed[(r*7+c)%seed.length]?'':'o');
+    q.appendChild(i);
+  }
+}
+
+/* ================= 购物车 ================= */
+const CART=[];
+const BOOKINGS=[], ORDERS=[];
+
+/* 预约/订单列表 */
+function openList(kind){
+  if(kind==='bookings'){
+    $('#list-title').textContent='我的预约';
+    $('#list-count').textContent=BOOKINGS.length+' 条';
+    $('#list-items').innerHTML = BOOKINGS.length ? BOOKINGS.map(b=>`<div class="ci"><div class="nm"><b>${b.date} ${b.time} · ${esc(b.item)}</b><i>${b.cnt} 人 · ${esc(b.name)} · ${b.code}</i></div></div>`).join('') : '<p class="cart-empty">还没有预约 · 去「体验」页约一场</p>';
+  } else {
+    $('#list-title').textContent='商城订单';
+    $('#list-count').textContent=ORDERS.length+' 单';
+    $('#list-items').innerHTML = ORDERS.length ? ORDERS.map(o=>`<div class="ci"><div class="nm"><b>${o.code}</b><i>${o.qty} 件 · 已提交（演示）</i></div><span class="lp">¥${o.total}</span></div>`).join('') : '<p class="cart-empty">还没有订单 · 去「好物」页逛逛</p>';
+  }
+  openSheet(listSheet);
+}
+$('#list-close').addEventListener('click', closeSheets);
+function cartQty(){ return CART.reduce((a,x)=>a+x.qty,0); }
+function cartTotal(){ return CART.reduce((a,x)=>a+x.qty*x.price,0); }
+function syncCart(){
+  const n=cartQty(), t=cartTotal();
+  const bdg=$('#cart-bdg');
+  bdg.style.display = n? 'flex':'none';
+  bdg.textContent = n;
+  $('#cart-bar').style.display = n? 'flex':'none';
+  $('#cb-count').textContent = n; $('#cb-qty').textContent = n; $('#cb-total').textContent = t;
+  $('#cart-count').textContent = n + ' 件';
+  $('#cart-total').textContent = t;
+  $('#cart-items').innerHTML = n ? CART.map((x,i)=>`<div class="ci">
+      <div class="nm"><b>${esc(x.name)}</b><i>¥${x.price} / 件</i></div>
+      <span class="stepper sm"><button data-dec="${i}" aria-label="减少">−</button><b>${x.qty}</b><button data-inc="${i}" aria-label="增加">＋</button></span>
+      <span class="lp">¥${x.qty*x.price}</span>
+      <button class="rm" data-rm="${i}" aria-label="移除">✕</button>
+    </div>`).join('') : '<p class="cart-empty">购物车是空的 · 演示</p>';
+}
+function addToCart(name,price){
+  const f=CART.find(x=>x.name===name); f?f.qty++:CART.push({name,price,qty:1});
+  syncCart(); showToast('已加入购物车');
+}
+document.addEventListener('click', e=>{
+  const add=e.target.closest('[data-add]');
+  if(add){ addToCart(add.dataset.add, +add.dataset.price); return; }
+  const inc=e.target.closest('[data-inc]'); if(inc){ CART[+inc.dataset.inc].qty=Math.min(9,CART[+inc.dataset.inc].qty+1); syncCart(); return; }
+  const dec=e.target.closest('[data-dec]'); if(dec){ const it=CART[+dec.dataset.dec]; it.qty=Math.max(1,it.qty-1); syncCart(); return; }
+  const rm=e.target.closest('[data-rm]');  if(rm){ CART.splice(+rm.dataset.rm,1); syncCart(); return; }
+});
+$('#cart-bdg').addEventListener('click', e=>{ e.stopPropagation(); if(cartQty()){ syncCart(); openSheet(cartSheet); } else showToast('购物车是空的 · 先去好物页加购'); });
+$('#cart-bar').addEventListener('click', ()=>{ syncCart(); openSheet(cartSheet); });
+$('#cart-submit').addEventListener('click',()=>{
+  if(!cartQty()){ showToast('购物车是空的'); return; }
+  const d=new Date();
+  const code=`NO. 2026${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}-0182`;
+  $('#cart-ok-info').textContent=`${cartQty()} 件 · 合计 ¥${cartTotal()}`;
+  $('#cart-code').textContent=code;
+  ORDERS.unshift({qty:cartQty(),total:cartTotal(),code});
+  $('#cart-view').style.display='none';
+  $('#cart-ok').style.display='block';
+});
+$('#cart-done').addEventListener('click',()=>{
+  CART.length=0; syncCart(); closeSheets(); showToast('演示结束 · 未发生真实交易');
+});
+syncCart();
+
+/* ================= 详情 ================= */
+let curDetail=null;
+function openDetail(kind, idx){
+  curDetail={kind,idx};
+  const dv=$('#detail-view');
+  if(kind==='exp'){
+    const e=EXPS[idx]; if(!e) return;
+    const vars=Object.entries(e.vars||{}).map(([k,v])=>`${k}:${v}`).join(';');
+    dv.innerHTML=`
+      <div class="dt-hero"><svg viewBox="80 40 232 220" preserveAspectRatio="xMidYMid slice" style="${vars}" aria-hidden="true"><use href="#carp-art"/></svg></div>
+      <div class="dt-body">
+        <div class="dt-title"><b class="serif">${esc(e.name)}</b><span class="pr">¥${e.price}<i>/人</i></span></div>
+        <div class="dt-sub">${esc(e.dur)} · ${esc(e.inc)} · ${esc(e.pop||'')}</div>
+        <p class="dt-desc">${esc(e.story||'')}</p>
+        <div class="dt-cap">工序五步</div>
+        <div class="dt-steps"><span>勾</span><span>刻</span><span>印</span><span>绘</span><span>裱</span></div>
+        <div class="dt-cap">预订须知</div>
+        <div class="dt-rows">
+          <div><span>容纳人数</span><b>每场 6 位</b></div>
+          <div><span>改期规则</span><b>开课前 2 小时可免费改期</b></div>
+          <div><span>自带物品</span><b>无需准备 · 材料全含</b></div>
+        </div>
+      </div>
+      <div class="dt-cta"><span class="p">¥${e.price}<i>/人</i></span><button class="btn" id="dt-cta">立即预约</button></div>`;
+  } else {
+    const g=GOODS[idx]; if(!g) return;
+    const vars=Object.entries(g.vars||{}).map(([k,v])=>`${k}:${v}`).join(';');
+    const specs=(g.specs||[]).map(([k,v])=>`<div><span>${esc(k)}</span><b>${esc(v)}</b></div>`).join('');
+    dv.innerHTML=`
+      <div class="dt-hero"><svg viewBox="${g.vb}" preserveAspectRatio="xMidYMid slice" style="${vars}" aria-hidden="true"><use href="${SYMBOL(g.sym)}"/></svg></div>
+      <div class="dt-body">
+        <div class="dt-title"><b class="serif">${esc(g.name)}</b><span class="pr">¥${g.price}</span></div>
+        <div class="dt-sub">${esc(g.tag)} · 满 99 包邮</div>
+        <p class="dt-desc">${esc(g.story||'')}</p>
+        <div class="dt-cap">商品参数</div>
+        <div class="dt-rows">${specs}</div>
+        <div class="dt-cap">服务</div>
+        <div class="dt-rows">
+          <div><span>发货</span><b>顺丰 · 48 小时内发出</b></div>
+          <div><span>售后</span><b>破损包赔 · 7 天无理由</b></div>
+        </div>
+      </div>
+      <div class="dt-cta"><span class="p">¥${g.price}</span><button class="btn" id="dt-cta">加入购物车</button></div>`;
+  }
+  openSheet(detailSheet);
+  $('#dt-cta').onclick=()=>{
+    if(curDetail.kind==='exp'){
+      const e=EXPS[curDetail.idx];
+      cur={name:e.name,price:e.price,meta:`${e.dur} · ${e.inc}`,cnt:2};
+      $('#s-title').textContent=cur.name; $('#s-meta').textContent=cur.meta; $('#s-price').textContent=cur.price;
+      $('#sheet-form').style.display='flex'; $('#sheet-ok').style.display='none';
+      openSheet(sheet);
+    } else {
+      const g=GOODS[curDetail.idx];
+      addToCart(g.name,g.price);
+      closeSheets();
+    }
+  };
+}
+</script>
+</body>
+</html>
